@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OKAY, BUT WHY? — The Deep-Dive Journal into Modern Phenomena</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Syne, Playfair Display, Space Grotesk, Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;0,900;1,600;1,800&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind Custom Configuration -->
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        editorial: {
+                            black: '#0D0D0D',
+                            cream: '#FAF8F5',
+                            white: '#FFFFFF',
+                            pink: '#FF0055',
+                            pinkDark: '#D60047',
+                            lime: '#CCFF00',
+                            violet: '#7000FF',
+                            sand: '#EDE8E1',
+                            gray: '#6B6966',
+                            border: '#18181B'
+                        }
+                    },
+                    fontFamily: {
+                        display: ['Syne', 'sans-serif'],
+                        brand: ['Playfair Display', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['Space Grotesk', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'neo': '4px 4px 0px 0px #0D0D0D',
+                        'neo-lg': '6px 6px 0px 0px #0D0D0D',
+                        'neo-pink': '4px 4px 0px 0px #FF0055',
+                        'neo-lime': '4px 4px 0px 0px #CCFF00',
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        body {
+            background-color: #FAF8F5;
+            color: #0D0D0D;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        
+        .solid-modal {
+            background-color: rgba(13, 13, 13, 0.96) !important;
+        }
+        
+        /* Custom Scrollbars */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #FAF8F5;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #0D0D0D;
+            border-radius: 9999px;
+        }
+
+        /* Mobile Touch Scrolling Smoothness */
+        .touch-scroll {
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-x;
+        }
+
+        /* Scroll Interactivity Transitions */
+        header {
+            transition: padding 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .brand-header-container {
+            transition: padding 0.3s ease, max-height 0.3s ease, opacity 0.3s ease;
+        }
+        header.is-scrolled .brand-header-container {
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        header.is-scrolled h1 {
+            font-size: 1.5rem !important;
+        }
+        @media (min-width: 640px) {
+            header.is-scrolled h1 {
+                font-size: 2.25rem !important;
+            }
+        }
+        header.is-scrolled p.font-mono {
+            display: none !important;
+        }
+
+        /* Infinite Marquee Animation */
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            display: flex;
+            width: 200%;
+            animation: marquee 22s linear infinite;
+        }
+        .animate-marquee:hover {
+            animation-play-state: paused;
+        }
+
+        /* Pulse Glow Animation */
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(255,0,85,0.8)); }
+            50% { transform: scale(1.2); filter: drop-shadow(0 0 14px rgba(255,0,85,1)); }
+        }
+        .animate-pulse-glow {
+            animation: pulse-glow 2s infinite ease-in-out;
+        }
+
+        /* Sticker Tilt Effect */
+        .sticker-badge {
+            transform: rotate(-2deg);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .sticker-badge:hover {
+            transform: rotate(0deg) scale(1.04);
+        }
+
+        /* Visual Inline Edit Highlights */
+        .inline-editable-active {
+            outline: 2px dashed #FF0055 !important;
+            outline-offset: 4px;
+            cursor: pointer !important;
+            position: relative;
+        }
+        .inline-editable-active:hover {
+            background-color: rgba(255, 0, 85, 0.08) !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-editorial-pink selection:text-white">
+
+    <!-- EDITOR SESSION NOTIFICATION & CONTROL BAR (MOBILE & DESKTOP FULLY RESPONSIVE) -->
+    <div id="admin-active-bar" class="hidden bg-editorial-black text-white px-2.5 sm:px-4 py-2 text-[10px] sm:text-xs font-mono font-bold flex flex-wrap justify-between items-center gap-2 z-50 border-b-2 border-editorial-border sticky top-0 shadow-md">
+        <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="inline-block w-2.5 h-2.5 bg-editorial-lime rounded-full animate-ping"></span>
+            <span class="uppercase tracking-widest text-editorial-lime text-[10px] sm:text-xs"><i class="fa-solid fa-bolt mr-1"></i> EDITOR SESSION ACTIVE</span>
+            <button onclick="openFirebaseConfigModal()" id="cloud-sync-status" class="text-[9px] bg-gray-800 hover:bg-editorial-pink text-editorial-lime hover:text-white px-2 py-0.5 rounded font-mono uppercase ml-1 border border-gray-700 transition-colors cursor-pointer" title="Live Firebase Cloud Sync Connected">
+                <i class="fa-solid fa-cloud-arrow-up mr-1"></i> <span id="cloud-sync-text">FIREBASE LIVE SYNC</span>
+            </button>
+        </div>
+        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <button onclick="openFirebaseConfigModal()" class="bg-gray-800 text-editorial-lime hover:bg-editorial-pink hover:text-white px-2 sm:px-2.5 py-1.5 text-[10px] sm:text-[11px] font-mono font-bold uppercase transition-all border border-gray-700 cursor-pointer">
+                <i class="fa-solid fa-database mr-0.5 sm:mr-1"></i> FIREBASE KEYS
+            </button>
+            <button onclick="openSiteSettingsModal()" class="bg-editorial-lime text-editorial-black hover:bg-white px-2 sm:px-3 py-1.5 text-[10px] sm:text-[11px] font-mono font-bold uppercase transition-all shadow-neo cursor-pointer">
+                <i class="fa-solid fa-sliders mr-0.5 sm:mr-1"></i> EDIT SITE & BRANDING
+            </button>
+            <button onclick="toggleInlineEditMode()" id="inline-edit-toggle-btn" class="bg-editorial-cream text-editorial-black hover:bg-white px-2 sm:px-3 py-1.5 text-[10px] sm:text-[11px] font-mono font-bold uppercase transition-all border border-editorial-border cursor-pointer">
+                <i class="fa-solid fa-wand-magic-sparkles mr-0.5 sm:mr-1"></i> INLINE: OFF
+            </button>
+            <button onclick="openTickerEditModal()" class="bg-editorial-cream text-editorial-black hover:bg-white px-2 sm:px-3 py-1.5 text-[10px] sm:text-[11px] font-mono font-bold uppercase transition-all border border-editorial-border cursor-pointer">
+                <i class="fa-solid fa-bullhorn mr-0.5 sm:mr-1"></i> TICKER
+            </button>
+            <button onclick="openStudioModal()" class="bg-editorial-pink hover:bg-editorial-pinkDark text-white px-2 sm:px-3 py-1.5 text-[10px] sm:text-[11px] font-mono font-bold uppercase transition-all shadow-neo cursor-pointer">
+                <i class="fa-solid fa-plus mr-0.5 sm:mr-1"></i> WRITE
+            </button>
+            <button onclick="adminLogout()" class="underline hover:text-editorial-pink text-[10px] sm:text-[11px] font-mono font-bold uppercase cursor-pointer ml-1">
+                LOGOUT
+            </button>
+        </div>
+    </div>
+
+    <!-- INFINITE TREND TICKER -->
+    <div class="bg-editorial-black text-white border-b-2 border-editorial-border overflow-hidden py-2 font-mono text-[11px] uppercase tracking-wider select-none relative group">
+        <div id="marquee-ticker-content" class="animate-marquee whitespace-nowrap flex items-center gap-8 pr-32">
+            <!-- Dynamically rendered via renderTicker() -->
+        </div>
+        <button onclick="openTickerEditModal()" class="admin-only hidden absolute right-2 top-1/2 -translate-y-1/2 bg-editorial-black border-2 border-editorial-lime text-editorial-lime hover:bg-editorial-lime hover:text-editorial-black px-2.5 py-1 text-[10px] font-mono font-bold uppercase rounded shadow-neo cursor-pointer z-30 transition-all">
+            <i class="fa-solid fa-pen-to-square mr-1"></i> EDIT TICKER
+        </button>
+    </div>
+
+    <header id="main-header" class="border-b-2 border-editorial-border bg-white sticky top-0 z-40 shadow-sm">
+        <!-- TOP UTILITY STRIP -->
+        <div class="border-b border-editorial-border/20 px-4 py-1.5 text-[11px] font-mono flex justify-between items-center text-editorial-gray">
+            <div class="flex items-center gap-4">
+                <span class="font-bold text-editorial-black flex items-center gap-1.5 editable-element" data-key="volIssue" onclick="handleInlineClick('volIssue', 'Volume & Issue Label')">
+                    <span class="w-2 h-2 rounded-full bg-editorial-pink inline-block"></span> <span id="site-vol-issue">VOL. 26 • ISSUE 09</span>
+                </span>
+                <span class="hidden sm:inline-block text-editorial-border/40">•</span>
+                <span class="hidden sm:inline-block tracking-wider editable-element" data-key="edition" id="site-edition" onclick="handleInlineClick('edition', 'Edition Title')">GLOBAL DIGITAL EDITION</span>
+            </div>
+            <div class="flex items-center gap-3 sm:gap-5">
+                <button onclick="openSearchModal()" class="hover:text-editorial-pink font-bold transition-colors cursor-pointer flex items-center gap-1.5">
+                    <i class="fa-solid fa-magnifying-glass text-xs"></i> <span class="hidden sm:inline">SEARCH</span>
+                </button>
+                <button onclick="openSavedDrawer()" class="hover:text-editorial-pink font-bold transition-colors cursor-pointer flex items-center gap-1.5 bg-editorial-cream px-2.5 py-0.5 rounded-full border border-editorial-border">
+                    <i class="fa-solid fa-bookmark text-editorial-pink text-xs"></i> <span class="hidden sm:inline">SAVED</span>
+                    <span id="saved-count" class="bg-editorial-pink text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
+                </button>
+                <button id="admin-access-btn" onclick="openAdminAuthModal()" class="bg-editorial-black text-white hover:bg-editorial-pink font-bold uppercase tracking-wider text-[10px] px-2.5 py-1 rounded transition-colors cursor-pointer">
+                    EDITOR ACCESS
+                </button>
+            </div>
+        </div>
+
+        <!-- MAIN BRAND HEADER -->
+        <div class="brand-header-container py-3 sm:py-5 text-center px-4 bg-editorial-cream/40 relative">
+            <div class="max-w-7xl mx-auto flex flex-col items-center">
+                <div onclick="if(isInlineEditMode) { handleInlineClick('brandHeader', 'Brand Heading'); } else { triggerCuriosityEngine(); }" class="group cursor-pointer select-none inline-block relative editable-element" data-key="brandHeader">
+                    <h1 class="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight uppercase leading-none flex flex-wrap justify-center items-center gap-x-2 sm:gap-x-3 transition-all duration-300">
+                        <span id="site-brand-part1" class="text-editorial-black group-hover:text-editorial-pink transition-colors">OKAY,</span>
+                        <span id="site-brand-part2" class="text-editorial-pink italic font-brand relative inline-block group-hover:scale-105 transition-transform duration-300">
+                            <span id="site-brand-part2-text">BUT WHY?</span>
+                            <span class="absolute -top-1 -right-3 sm:-right-5 w-2.5 h-2.5 sm:w-4 sm:h-4 bg-editorial-lime border-2 border-editorial-black rounded-full animate-pulse-glow"></span>
+                        </span>
+                    </h1>
+                </div>
+                <p class="font-mono text-[11px] sm:text-xs tracking-widest text-editorial-gray uppercase mt-2 font-semibold flex items-center gap-2 editable-element" data-key="tagline" onclick="handleInlineClick('tagline', 'Tagline Subtitle')">
+                    <span class="h-px w-5 bg-editorial-pink"></span>
+                    <span id="site-tagline">THE DEEP-DIVE JOURNAL INTO MODERN PHENOMENA</span>
+                    <span class="h-px w-5 bg-editorial-pink"></span>
+                </p>
+            </div>
+        </div>
+
+        <!-- CATEGORY NAVIGATION TABS (TOUCH SCROLL OPTIMIZED) -->
+        <nav class="border-t-2 border-editorial-border bg-white overflow-x-auto custom-scrollbar touch-scroll">
+            <div id="category-tabs-container" class="max-w-7xl mx-auto flex justify-start sm:justify-center min-w-max px-3 sm:px-4 py-2 gap-1.5 sm:gap-2 text-xs font-mono font-bold uppercase">
+                <!-- Dynamically rendered via renderCategoryTabs() -->
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 space-y-8">
+        
+        <!-- INTERACTIVE CURIOSITY ENGINE BANNER -->
+        <section id="burning-question-banner" class="bg-editorial-black text-white p-4 sm:p-6 border-3 sm:border-4 border-editorial-border shadow-neo-lg rounded-2xl relative overflow-hidden group transition-all duration-300">
+            <div class="absolute -right-10 -bottom-10 w-40 h-40 sm:w-60 sm:h-60 bg-editorial-pink/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- ADMIN ACTION BAR FOR BURNING QUESTION -->
+            <div id="admin-burning-question-actions" class="hidden mb-3 pb-3 border-b border-gray-800 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+                <span class="text-editorial-lime flex items-center gap-2 font-bold text-[11px]">
+                    <i class="fa-solid fa-sliders"></i> EDITOR CONTROLS: BURNING QUESTION (<span id="curiosity-total-count">4</span> TOTAL)
+                </span>
+                <div class="flex items-center gap-2">
+                    <button onclick="openEditCuriosityModal()" class="bg-editorial-pink hover:bg-editorial-pinkDark text-white px-2.5 py-1 rounded font-bold uppercase transition-all shadow-neo text-[10px] cursor-pointer">
+                        <i class="fa-solid fa-pen-to-square mr-1"></i> EDIT THIS
+                    </button>
+                    <button onclick="addNewCuriosityQuestion()" class="bg-editorial-lime text-editorial-black hover:bg-white px-2.5 py-1 rounded font-bold uppercase transition-all shadow-neo text-[10px] cursor-pointer">
+                        <i class="fa-solid fa-plus mr-1"></i> ADD NEW
+                    </button>
+                    <button onclick="deleteCurrentCuriosityQuestion()" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded font-bold uppercase transition-all text-[10px] cursor-pointer">
+                        <i class="fa-solid fa-trash mr-1"></i> DELETE
+                    </button>
+                </div>
+            </div>
+
+            <div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                <div class="space-y-1.5 max-w-3xl">
+                    <div class="inline-flex items-center gap-1.5 bg-editorial-pink text-white font-mono text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full sticker-badge">
+                        <i class="fa-solid fa-fire text-editorial-lime animate-bounce"></i> TODAY'S BURNING QUESTION
+                    </div>
+                    <h2 class="font-brand text-lg sm:text-2xl lg:text-3xl font-extrabold text-white leading-tight" id="curiosity-question">
+                        "Why are luxury fashion houses reviving 90s minimalism in an era of digital chaos?"
+                    </h2>
+                </div>
+                <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full lg:w-auto shrink-0">
+                    <button onclick="voteCuriosity('NEED_ANSWERS')" class="flex-1 sm:flex-none bg-editorial-lime hover:bg-white text-editorial-black font-mono font-bold px-3.5 py-2.5 rounded-xl text-[11px] uppercase tracking-wider transition-all shadow-neo-pink hover:scale-105 cursor-pointer text-center flex items-center justify-center gap-1.5">
+                        🔥 NEED ANSWERS
+                    </button>
+                    <button onclick="voteCuriosity('OVERHYPED')" class="flex-1 sm:flex-none bg-editorial-pink hover:bg-editorial-pinkDark text-white font-mono font-bold px-3.5 py-2.5 rounded-xl text-[11px] uppercase tracking-wider transition-all shadow-neo-lime hover:scale-105 cursor-pointer text-center flex items-center justify-center gap-1.5">
+                        🥱 OVERHYPED
+                    </button>
+                    <button onclick="nextCuriosityQuestion()" class="bg-white/10 hover:bg-white/20 text-white font-mono font-bold px-3 py-2.5 rounded-xl text-[11px] uppercase tracking-wider transition-all border border-white/20 cursor-pointer text-center whitespace-nowrap">
+                        NEXT <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAIN GRID & SIDEBAR SECTION -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- LEFT MAIN COLUMN: HERO ARTICLE & ARTICLES GRID -->
+            <div class="lg:col-span-8 space-y-10">
+                <!-- HERO COVER STORY CONTAINER -->
+                <div id="hero-container">
+                    <!-- Dynamic Hero Card Rendered via JS -->
+                </div>
+
+                <!-- ARTICLES GRID CONTAINER -->
+                <div class="space-y-6">
+                    <div class="flex justify-between items-center border-b-2 border-editorial-border pb-3">
+                        <h3 class="font-display text-lg font-extrabold uppercase text-editorial-black flex items-center gap-2">
+                            <span class="w-3 h-3 bg-editorial-pink inline-block rounded-sm"></span> LATEST INQUIRIES
+                        </h3>
+                        <span id="active-category-label" class="font-mono text-xs font-bold text-editorial-pink uppercase bg-editorial-cream px-3 py-1 border border-editorial-border rounded-full">
+                            CATEGORY: ALL
+                        </span>
+                    </div>
+
+                    <div id="articles-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Dynamic Articles Grid Rendered via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT SIDEBAR: EDITOR'S PICK, RADAR, DIGEST, & MANIFESTO -->
+            <aside class="lg:col-span-4 space-y-8">
+                <!-- EDITOR SELECTION CONTAINER -->
+                <div id="editor-pick-container">
+                    <!-- Dynamic Editor Pick Rendered via JS -->
+                </div>
+
+                <!-- CURIOSITY RADAR: DAILY READER PULSE -->
+                <div id="curiosity-radar-card" class="bg-editorial-black text-white border-3 border-editorial-border p-6 shadow-neo rounded-2xl space-y-4 relative overflow-hidden group">
+                    <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                        <span class="bg-editorial-lime text-editorial-black text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-editorial-pink animate-ping"></span> <span id="radar-badge-title">CURIOSITY RADAR</span>
+                        </span>
+                        <div class="admin-only hidden flex items-center gap-1">
+                            <button onclick="openSiteSettingsModal()" class="bg-editorial-pink text-white hover:bg-white hover:text-editorial-black text-[10px] font-mono font-bold uppercase px-2 py-1 rounded transition-colors cursor-pointer">
+                                <i class="fa-solid fa-pen-to-square mr-1"></i> EDIT RADAR
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <span class="text-[10px] font-mono font-bold text-editorial-pink uppercase tracking-widest">LIVE PULSE POLL</span>
+                        <h4 id="radar-question-text" class="font-brand text-lg font-bold leading-snug text-white">
+                            "Is AI-generated haute couture genuine art or glorified digital plagiarism?"
+                        </h4>
+                    </div>
+
+                    <!-- VOTING INTERACTIVE BUTTONS & PROGRESS BARS -->
+                    <div class="space-y-3 pt-1" id="radar-voting-container">
+                        <!-- Dynamically rendered via renderCuriosityRadar() -->
+                    </div>
+
+                    <!-- READER PROMPT SUBMISSION FORM -->
+                    <div class="pt-3 border-t border-gray-800 space-y-2">
+                        <label class="block text-[10px] font-mono font-bold uppercase text-gray-400">
+                            <i class="fa-solid fa-paper-plane text-editorial-lime mr-1"></i> SUBMIT YOUR OWN "WHY?" PROMPT
+                        </label>
+                        <form onsubmit="handleRadarPromptSubmit(event)" class="flex gap-2">
+                            <input type="text" id="radar-user-prompt" required placeholder="Why do we..." class="w-full px-3 py-1.5 bg-gray-900 border border-gray-700 rounded-lg text-base sm:text-xs font-mono text-white focus:outline-none focus:border-editorial-pink">
+                            <button type="submit" class="bg-editorial-pink hover:bg-editorial-pinkDark text-white text-[10px] font-mono font-bold uppercase px-3 py-1.5 rounded-lg shrink-0 cursor-pointer shadow-neo">
+                                SUBMIT
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- WEEKLY DIGEST NEWSLETTER & SUBSCRIBER SYSTEM -->
+                <div class="bg-white border-3 border-editorial-border p-6 shadow-neo rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="bg-editorial-pink text-white text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded-full sticker-badge">
+                            <i class="fa-solid fa-paper-plane mr-1"></i> WEEKLY DIGEST
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <!-- SUBSCRIBER COUNT BADGE (CLICKABLE FOR EDITORS) -->
+                            <button onclick="openSubscribersModal()" id="digest-sub-count-btn" class="admin-only hidden bg-editorial-lime text-editorial-black font-mono text-[10px] font-bold px-2 py-0.5 rounded border border-editorial-border hover:bg-white cursor-pointer" title="Manage Subscribers">
+                                <i class="fa-solid fa-users mr-1"></i> <span id="digest-sub-badge-count">0</span> SUBS
+                            </button>
+                            <i class="fa-solid fa-envelope-open-text text-editorial-pink text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <h4 class="font-brand text-xl font-extrabold uppercase text-editorial-black">CNNNDD</h4>
+                        <p class="text-xs text-editorial-gray font-sans">
+                            Get our weekly deep-dive editorial breakdown delivered straight to your inbox every Sunday morning.
+                        </p>
+                    </div>
+                    <form onsubmit="handleDigestSubscribe(event)" class="space-y-2.5">
+                        <input type="email" id="digest-email-input" required placeholder="Enter your email address..." class="w-full px-3.5 py-2.5 bg-editorial-cream border-2 border-editorial-border rounded-xl text-base sm:text-xs font-mono text-editorial-black focus:outline-none focus:border-editorial-pink">
+                        <button type="submit" class="w-full bg-editorial-black hover:bg-editorial-pink text-white font-mono font-bold py-2.5 px-4 rounded-xl text-xs uppercase tracking-wider transition-all shadow-neo cursor-pointer">
+                            SUBSCRIBE NOW
+                        </button>
+                    </form>
+                </div>
+
+                <!-- EDITORIAL MANIFESTO -->
+                <div class="bg-editorial-sand/60 border-3 border-editorial-border p-6 rounded-2xl space-y-3">
+                    <span class="font-mono text-[10px] uppercase tracking-widest text-editorial-pink font-bold block">
+                        <i class="fa-solid fa-feather mr-1"></i> THE MANIFESTO
+                    </span>
+                    <h4 class="font-brand text-lg font-bold italic leading-snug text-editorial-black">
+                        "We refuse shallow scrolling. Every modern artifact has a hidden architecture of desire."
+                    </h4>
+                    <p class="text-xs text-editorial-gray leading-relaxed">
+                        OKAY, BUT WHY? is an independent digital journal dissecting the subtext of contemporary culture, design traps, and internet phenomena.
+                    </p>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-editorial-black text-white border-t-3 border-editorial-border mt-16 py-12 px-4">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="space-y-3 md:col-span-2">
+                <h3 class="font-display text-xl font-extrabold tracking-wider uppercase flex items-center gap-2">
+                    OKAY, <span class="text-editorial-pink italic font-brand">BUT WHY?</span>
+                </h3>
+                <p class="text-xs text-gray-400 max-w-md font-sans">
+                    An uncompromising deep-dive journal into modern phenomena. Investigating why we consume what we consume and live how we live.
+                </p>
+                <div class="text-[10px] font-mono text-editorial-lime pt-2">
+                    <i class="fa-solid fa-shield-halved mr-1"></i> SECURE CLOUD SYNCED EDITION • ALL RIGHTS RESERVED
+                </div>
+            </div>
+            <div class="space-y-2 text-xs font-mono">
+                <span class="text-editorial-pink font-bold uppercase tracking-wider block mb-2">SECTIONS</span>
+                <ul class="space-y-1.5 text-gray-300">
+                    <li><a href="#" onclick="filterCategory('ALL')" class="hover:text-editorial-pink transition-colors">All Inquiries</a></li>
+                    <li><a href="#" onclick="filterCategory('FASHION')" class="hover:text-editorial-pink transition-colors">Fashion & Archives</a></li>
+                    <li><a href="#" onclick="filterCategory('LIFESTYLE')" class="hover:text-editorial-pink transition-colors">Modern Lifestyle</a></li>
+                    <li><a href="#" onclick="filterCategory('SOCIETAL')" class="hover:text-editorial-pink transition-colors">Societal Shifts</a></li>
+                    <li><a href="#" onclick="filterCategory('CULTURE')" class="hover:text-editorial-pink transition-colors">Digital Culture</a></li>
+                </ul>
+            </div>
+            <div class="space-y-2 text-xs font-mono">
+                <span class="text-editorial-pink font-bold uppercase tracking-wider block mb-2">EDITOR ACCESS</span>
+                <p class="text-gray-400 text-[11px]">
+                    Authorized editorial staff can access live multi-device publishing tools below.
+                </p>
+                <button onclick="openAdminAuthModal()" class="bg-editorial-lime text-editorial-black font-bold uppercase text-[10px] px-3 py-2 rounded shadow-neo hover:bg-white transition-all cursor-pointer block mt-2">
+                    <i class="fa-solid fa-lock-open mr-1"></i> LOGIN TO EDITORIAL SUITE
+                </button>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto border-t border-gray-800 mt-8 pt-6 flex flex-wrap justify-between items-center text-[10px] font-mono text-gray-500">
+            <span>© 2026 OKAY, BUT WHY? JOURNAL. PUBLISHED GLOBALLY.</span>
+            <span class="text-editorial-lime">LIVE CLOUD SYNC ACTIVE</span>
+        </div>
+    </footer>
+
+    <!-- 1. ADMIN AUTH MODAL -->
+    <div id="admin-auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-editorial-black border-3 border-editorial-border text-white w-full max-w-md p-6 rounded-2xl shadow-neo-lg relative space-y-5">
+            <button onclick="closeAdminAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="space-y-1">
+                <span class="bg-editorial-pink text-white font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded">RESTRICTED ACCESS</span>
+                <h3 class="font-display text-xl font-bold uppercase">Editor Authentication</h3>
+                <p class="text-xs text-gray-400 font-sans">Enter your editor credentials to unlock live publishing and multi-device cloud synchronization.</p>
+            </div>
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div class="space-y-1">
+                    <label class="block text-xs font-mono uppercase text-editorial-lime">Editor ID / Username</label>
+                    <input type="text" id="admin-username" required class="w-full px-3.5 py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-base sm:text-xs font-mono text-white focus:outline-none focus:border-editorial-pink">
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-xs font-mono uppercase text-editorial-lime">Password</label>
+                    <input type="password" id="admin-password" required placeholder="••••••••••" class="w-full px-3.5 py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-base sm:text-xs font-mono text-white focus:outline-none focus:border-editorial-pink">
+                </div>
+                <div id="admin-login-error" class="hidden text-red-400 text-xs font-mono">Invalid credentials. Please verify your editor account.</div>
+                <button type="submit" class="w-full bg-editorial-lime hover:bg-white text-editorial-black font-mono font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition-all shadow-neo cursor-pointer">
+                    AUTHENTICATE
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. STUDIO WRITER CMS MODAL -->
+    <div id="studio-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2 sm:p-4">
+        <div class="bg-editorial-black border-3 border-editorial-border text-white w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl shadow-neo-lg relative">
+            <div class="p-4 sm:p-6 border-b border-gray-800 flex justify-between items-center shrink-0">
+                <div class="space-y-0.5">
+                    <span class="bg-editorial-pink text-white font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded">CMS PUBLISHING SUITE</span>
+                    <h3 id="studio-modal-title" class="font-display text-lg sm:text-xl font-bold uppercase">Write New Inquiry</h3>
+                </div>
+                <button onclick="closeStudioModal()" class="text-gray-400 hover:text-white text-xl cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="p-4 sm:p-6 overflow-y-auto custom-scrollbar space-y-4 flex-grow">
+                <form id="studio-form" onsubmit="handleStudioSubmit(event)" class="space-y-4">
+                    <input type="hidden" id="studio-article-id">
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="block text-xs font-mono uppercase text-editorial-lime">Article Title</label>
+                            <input type="text" id="studio-title" required placeholder="Why is..." class="w-full px-3.5 py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-base sm:text-xs font-mono text-white focus:outline-none focus:border-editorial-pink">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-xs font-mono uppercase text-editorial-lime">Category</label>
+                            <select id="studio-category" class="w-full px-3.5 py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-base sm:text-xs font-mono text-white focus:outline-none focus:border-editorial-pink">
+                                <!-- Dynamically populated categories -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="block text-xs font-mono uppercase text-editorial-lime">Image URL (Unsplash / Placeholder)</label>
+                            <input type="url" id="studio-image" required value="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=1200" class="w-full px-3.5 py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-base sm:text-xs font-mono text-white focus:outline-none focus:border-editorial-pink">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-xs font-mono uppercase text-editorial-lime">Author Name</label>
+                            <input type="text" id="studio-author" required value="Kean Donato" class="w-full px-3.5 py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-base sm:text-xs font-mono text-white focus:outline-none focus:border-editorial-pink">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="block text-xs font-mono uppercase text-editorial-lime">Short Excerpt / Subtitle</label>
+                        <textarea id="studio-excerpt" rows="2" required placeholder="Tactile history and individualism are outshining disposable trends..." class="w-full px-3.5 py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-base sm:text-xs font-mono text-white focus:outline-none focus:border-editorial-pink"></textarea>
+                    </div>
+
+                    <!-- FORMATTING TOOLBAR -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-center">
+                            <label class="block text-xs font-mono uppercase text-editorial-lime">Full Article Body & Deep-Dive</label>
+                            <div class="flex items-center gap-1.5 bg-gray-900 p-1 rounded-lg border border-gray-700">
+                                <button type="button" onclick="insertStudioFormat('**', '**'); return false;" class="px-2 py-1 bg-gray-800 hover:bg-editorial-pink text-white text-[10px] font-mono rounded font-bold" title="Bold"><b>B</b></button>
+                                <button type="button" onclick="insertStudioFormat('*', '*'); return false;" class="px-2 py-1 bg-gray-800 hover:bg-editorial-pink text-white text-[10px] font-mono rounded italic" title="Italic"><i>I</i></button>
+                                <button type="button" onclick="insertStudioFormat('\n\n> ', ''); return false;" class="px-2 py-1 bg-gray-800 hover:bg-editorial-pink text-white text-[10px] font-mono rounded" title="Quote"><i class="fa-solid fa-quote-right"></i></button>
+                                <button type="button" onclick="insertStudioFormat('\n\n## ', ''); return false;" class="px-2 py-1 bg-gray-800 hover:bg-editorial-pink text-white text-[10px] font-mono rounded font-bold" title="Heading">H2</button>
+                            </div>
+                        </div>
+                        <textarea id="studio-content" rows="6" required placeholder="Write your full deep-dive essay here... Supports markdown formatting." class="w-full px-3.5 py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-base sm:text-xs font-mono text-white focus:outline-none focus:border-editorial-pink"></textarea>
+                    </div>
+
+                    <!-- CHECKBOXES FOR SPECIAL PLACEMENT & NOTIFICATIONS -->
+                    <div class="p-4 bg-gray-900 border border-gray-800 rounded-xl space-y-2">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="studio-is-hero" class="w-4 h-4 accent-editorial-pink cursor-pointer">
+                            <label for="studio-is-hero" class="text-xs font-mono text-white cursor-pointer select-none">
+                                🌟 Set as Cover Story (Hero Banner on Homepage)
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="studio-is-editor-pick" class="w-4 h-4 accent-editorial-pink cursor-pointer">
+                            <label for="studio-is-editor-pick" class="text-xs font-mono text-white cursor-pointer select-none">
+                                ⭐ Set as Editor's Choice (Sidebar Featured Card)
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-3 pt-2 border-t border-gray-800">
+                            <input type="checkbox" id="studio-notify-digest" checked class="w-4 h-4 accent-editorial-lime cursor-pointer">
+                            <label for="studio-notify-digest" class="text-xs font-mono text-editorial-lime cursor-pointer select-none font-bold">
+                                📩 Notify Weekly Digest Subscribers instantly upon publishing
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-2">
+                        <button type="button" onclick="closeStudioModal()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-xl font-mono text-xs uppercase cursor-pointer">Cancel</button>
+                        <button type="submit" class="px-6 py-2.5 bg-editorial-pink hover:bg-editorial-pinkDark text-white rounded-xl font-mono text-xs uppercase font-bold tracking-wider shadow-neo cursor-pointer">Publish Article</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. SITE SETTINGS & BRANDING MODAL -->
+    <div id="site-settings-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-editorial-black border-3 border-editorial-border text-white w-full max-w-2xl max-h-[90vh] flex flex-col rounded-2xl shadow-neo-lg relative">
+            <div class="p-6 border-b border-gray-800 flex justify-between items-center shrink-0">
+                <div class="space-y-0.5">
+                    <span class="bg-editorial-lime text-editorial-black font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded">MASTER CONTROL CENTER</span>
+                    <h3 class="font-display text-xl font-bold uppercase">Edit Site Branding & Categories</h3>
+                </div>
+                <button onclick="closeSiteSettingsModal()" class="text-gray-400 hover:text-white text-xl cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto custom-scrollbar space-y-5 flex-grow font-sans text-xs">
+                <form id="site-settings-form" onsubmit="handleSaveSiteSettings(event)" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="block font-mono uppercase text-editorial-lime">Brand Title Part 1</label>
+                            <input type="text" id="set-brand1" required class="w-full px-3.5 py-2 bg-gray-900 border border-gray-700 rounded-xl font-mono text-white">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block font-mono uppercase text-editorial-lime">Brand Title Part 2 (Italic)</label>
+                            <input type="text" id="set-brand2" required class="w-full px-3.5 py-2 bg-gray-900 border border-gray-700 rounded-xl font-mono text-white">
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="block font-mono uppercase text-editorial-lime">Tagline Subtitle</label>
+                        <input type="text" id="set-tagline" required class="w-full px-3.5 py-2 bg-gray-900 border border-gray-700 rounded-xl font-mono text-white">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="block font-mono uppercase text-editorial-lime">Volume & Issue Label</label>
+                            <input type="text" id="set-vol" required class="w-full px-3.5 py-2 bg-gray-900 border border-gray-700 rounded-xl font-mono text-white">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block font-mono uppercase text-editorial-lime">Edition Name</label>
+                            <input type="text" id="set-edition" required class="w-full px-3.5 py-2 bg-gray-900 border border-gray-700 rounded-xl font-mono text-white">
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-1 pt-2 border-t border-gray-800">
+                        <label class="block font-mono uppercase text-editorial-lime">Curiosity Radar Poll Question</label>
+                        <input type="text" id="set-radar-q" required class="w-full px-3.5 py-2 bg-gray-900 border border-gray-700 rounded-xl font-mono text-white">
+                    </div>
+
+                    <div class="space-y-2 pt-2 border-t border-gray-800">
+                        <label class="block font-mono uppercase text-editorial-lime">Active Categories (Comma Separated)</label>
+                        <input type="text" id="set-categories" required class="w-full px-3.5 py-2 bg-gray-900 border border-gray-700 rounded-xl font-mono text-white">
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-3">
+                        <button type="button" onclick="closeSiteSettingsModal()" class="px-4 py-2 bg-gray-800 text-white rounded-xl font-mono uppercase">Cancel</button>
+                        <button type="submit" class="px-6 py-2.5 bg-editorial-lime text-editorial-black rounded-xl font-mono uppercase font-bold shadow-neo cursor-pointer">Save All Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. TICKER EDITOR MODAL -->
+    <div id="ticker-edit-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-editorial-black border-3 border-editorial-border text-white w-full max-w-lg p-6 rounded-2xl shadow-neo-lg relative space-y-4 font-sans text-xs">
+            <div class="flex justify-between items-center">
+                <h3 class="font-display text-lg font-bold uppercase text-editorial-lime">Edit Trend Ticker Headlines</h3>
+                <button onclick="closeTickerEditModal()" class="text-gray-400 hover:text-white text-lg cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-gray-400">Enter headline items separated by vertical pipes (|) or new lines:</p>
+            <textarea id="ticker-items-input" rows="5" class="w-full p-3 bg-gray-900 border border-gray-700 rounded-xl font-mono text-white text-xs"></textarea>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeTickerEditModal()" class="px-4 py-2 bg-gray-800 text-white rounded-xl font-mono uppercase">Cancel</button>
+                <button onclick="saveTickerItems()" class="px-5 py-2.5 bg-editorial-lime text-editorial-black font-mono font-bold rounded-xl uppercase shadow-neo cursor-pointer">Update Ticker</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. BURNING QUESTION EDITOR MODAL -->
+    <div id="curiosity-edit-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-editorial-black border-3 border-editorial-border text-white w-full max-w-md p-6 rounded-2xl shadow-neo-lg relative space-y-4 font-sans text-xs">
+            <div class="flex justify-between items-center">
+                <h3 class="font-display text-lg font-bold uppercase text-editorial-lime">Edit Burning Question</h3>
+                <button onclick="closeEditCuriosityModal()" class="text-gray-400 hover:text-white text-lg cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-1">
+                <label class="block font-mono uppercase text-gray-400">Question Prompt</label>
+                <textarea id="edit-curiosity-text" rows="3" class="w-full p-3 bg-gray-900 border border-gray-700 rounded-xl font-mono text-white text-xs"></textarea>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeEditCuriosityModal()" class="px-4 py-2 bg-gray-800 text-white rounded-xl font-mono uppercase">Cancel</button>
+                <button onclick="saveCuriosityEdit()" class="px-5 py-2.5 bg-editorial-pink text-white font-mono font-bold rounded-xl uppercase shadow-neo cursor-pointer">Save Question</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. SUBSCRIBER MANAGEMENT MODAL -->
+    <div id="subscribers-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-editorial-black border-3 border-editorial-border text-white w-full max-w-lg p-6 rounded-2xl shadow-neo-lg relative space-y-4 font-sans text-xs">
+            <div class="flex justify-between items-center">
+                <h3 class="font-display text-lg font-bold uppercase text-editorial-lime">Weekly Digest Subscribers</h3>
+                <button onclick="closeSubscribersModal()" class="text-gray-400 hover:text-white text-lg cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-gray-400">Total registered emails receiving automated broadcast notifications:</p>
+            <div id="subscribers-list-container" class="bg-gray-900 p-3 rounded-xl max-h-48 overflow-y-auto font-mono text-xs space-y-1 text-editorial-lime">
+                <!-- Dynamically populated -->
+            </div>
+            <div class="flex justify-between items-center pt-2">
+                <button onclick="sendTestDigestBroadcast()" class="px-4 py-2 bg-editorial-pink hover:bg-editorial-pinkDark text-white font-mono font-bold rounded-xl uppercase cursor-pointer">
+                    <i class="fa-solid fa-paper-plane mr-1"></i> Send Test Broadcast
+                </button>
+                <button onclick="closeSubscribersModal()" class="px-4 py-2 bg-gray-800 text-white rounded-xl font-mono uppercase">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. FIREBASE CREDENTIALS CONFIG MODAL -->
+    <div id="firebase-config-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-editorial-black border-3 border-editorial-border text-white w-full max-w-lg p-6 rounded-2xl shadow-neo-lg relative space-y-4 font-sans text-xs">
+            <div class="flex justify-between items-center">
+                <h3 class="font-display text-lg font-bold uppercase text-editorial-lime"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> Firebase Real-Time Cloud Sync</h3>
+                <button onclick="closeFirebaseConfigModal()" class="text-gray-400 hover:text-white text-lg cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-gray-400 leading-relaxed">
+                Your app is connected to project <code class="text-editorial-lime">okaybutwhysemi</code>. Every edit made via Editor Access syncs instantly in real time across Vercel and all user browsers worldwide.
+            </p>
+            <div class="bg-gray-900 p-3 rounded-xl font-mono text-[11px] text-editorial-lime space-y-1">
+                <div>Status: <span class="text-white font-bold">🟢 Connected to Firestore</span></div>
+                <div>Project ID: <span class="text-white">okaybutwhysemi</span></div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeFirebaseConfigModal()" class="px-5 py-2.5 bg-editorial-lime text-editorial-black font-mono font-bold rounded-xl uppercase shadow-neo cursor-pointer">OK, GOT IT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. ARTICLE READER FULL MODAL -->
+    <div id="article-reader-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-2 sm:p-6">
+        <div class="bg-editorial-cream text-editorial-black border-4 border-editorial-border w-full max-w-4xl max-h-[96vh] flex flex-col rounded-2xl shadow-neo-lg relative overflow-hidden">
+            <div class="p-4 sm:p-6 bg-editorial-black text-white flex justify-between items-center shrink-0">
+                <span id="reader-category-pill" class="bg-editorial-pink text-white text-[10px] font-mono font-bold uppercase px-3 py-1 rounded-full">FASHION</span>
+                <button onclick="closeArticleReader()" class="text-gray-400 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 sm:p-10 overflow-y-auto custom-scrollbar space-y-6 flex-grow">
+                <div class="space-y-3 max-w-2xl mx-auto">
+                    <h1 id="reader-title" class="font-display text-2xl sm:text-4xl font-extrabold uppercase leading-tight">Title</h1>
+                    <div class="flex items-center gap-4 font-mono text-xs text-editorial-gray">
+                        <span><i class="fa-solid fa-pen-nib mr-1"></i> <span id="reader-author">Author</span></span>
+                        <span>•</span>
+                        <span><i class="fa-solid fa-clock mr-1"></i> <span id="reader-date">Date</span></span>
+                    </div>
+                </div>
+                <div class="max-w-3xl mx-auto rounded-2xl overflow-hidden border-3 border-editorial-border shadow-neo">
+                    <img id="reader-image" src="" alt="Article Visual" class="w-full h-64 sm:h-96 object-cover" onerror="this.src='https://placehold.co/1200x600/0D0D0D/FFFFFF?text=OKAY+BUT+WHY?'">
+                </div>
+                <div id="reader-body" class="max-w-2xl mx-auto font-sans text-sm sm:text-base leading-relaxed space-y-4 text-editorial-black">
+                    <!-- Dynamic Body -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 9. SEARCH MODAL -->
+    <div id="search-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-start justify-center pt-20 p-4">
+        <div class="bg-editorial-black border-3 border-editorial-border text-white w-full max-w-xl p-6 rounded-2xl shadow-neo-lg relative space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="font-display text-lg font-bold uppercase text-editorial-lime"><i class="fa-solid fa-magnifying-glass mr-2"></i> Search Inquiries</h3>
+                <button onclick="closeSearchModal()" class="text-gray-400 hover:text-white text-lg cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <input type="text" id="search-input" oninput="handleSearchInput(event)" placeholder="Search titles, topics, phenomena..." class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-xl font-mono text-white text-sm focus:outline-none focus:border-editorial-pink">
+            <div id="search-results-container" class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar font-sans text-xs">
+                <!-- Dynamic Results -->
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION NOTIFICATION BAR -->
+    <div id="toast-notification" class="fixed bottom-6 right-6 bg-editorial-black text-white border-2 border-editorial-lime px-4 py-3 rounded-xl shadow-neo-lg z-50 hidden flex items-center gap-3 font-mono text-xs">
+        <span class="w-2.5 h-2.5 rounded-full bg-editorial-lime animate-ping"></span>
+        <span id="toast-message">Action successful</span>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+        import { getFirestore, collection, doc, setDoc, getDocs, onSnapshot, deleteDoc, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Your exact Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCeRBJPDIWsuRQp1N1EfpeDydb2xzfNBCk",
+            authDomain: "okaybutwhysemi.firebaseapp.com",
+            projectId: "okaybutwhysemi",
+            storageBucket: "okaybutwhysemi.firebasestorage.app",
+            messagingSenderId: "585004541665",
+            appId: "1:585004541665:web:d1456cf68ca75da14879a0",
+            measurementId: "G-PVDPKJ3QG9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // GLOBAL APP STATE
+        window.isAdminLoggedIn = localStorage.getItem('obw_admin_auth') === 'true';
+        window.isInlineEditMode = false;
+        window.activeCategory = 'ALL';
+        window.currentCuriosityIndex = 0;
+        window.savedArticleIds = JSON.parse(localStorage.getItem('obw_saved') || '[]');
+
+        // DEFAULT DATA FALLBACKS
+        window.siteBranding = {
+            brand1: "OKAY,",
+            brand2: "BUT WHY?",
+            tagline: "THE DEEP-DIVE JOURNAL INTO MODERN PHENOMENA",
+            volIssue: "VOL. 26 • ISSUE 09",
+            edition: "GLOBAL DIGITAL EDITION",
+            radarQuestion: "Is AI-generated haute couture genuine art or glorified digital plagiarism?",
+            categories: ["ALL", "FASHION", "LIFESTYLE", "SOCIETAL ISSUES", "CULTURE", "NEWS", "LIVING"]
+        };
+
+        window.tickerItems = [
+            "🔥 BURNING INQUIRY: WHY ARE 90S VINTAGE CAMERAS DOMINATING GEN Z FEEDS?",
+            "✨ CULTURAL SHIFT: THE RETURN OF WIRED HEADPHONES AS STATUS SYMBOLS",
+            "⚡ TRENDING: WHY ARE DIGITAL CAMERA SALES SPIKING AMONG GEN Z?",
+            "🎯 DEEP DIVE: THE ARCHITECTURE OF MODERN PRODUCTIVITY ANXIETY"
+        ];
+
+        window.curiosityQuestions = [
+            { id: 1, text: "Why are luxury fashion houses reviving 90s minimalism in an era of digital chaos?" },
+            { id: 2, text: "Why do we feel compelled to document every meal in aesthetic high-definition?" },
+            { id: 3, text: "Why is open-office architecture surviving despite universal employee exhaustion?" },
+            { id: 4, text: "Why has analog journaling spiked among high-performing tech executives?" }
+        ];
+
+        window.articles = [
+            {
+                id: 'art-1',
+                title: "The Death of Fast Fashion: Why Digital Natives Prefer Vintage Archives",
+                category: "FASHION",
+                excerpt: "Tactile history and individualism are outshining disposable trends as resale platforms boom worldwide.",
+                content: "We live in an era of infinite digital replication where any outfit can be rendered in seconds. Yet, physical garments carrying history, wear, and provenance have become the ultimate luxury.\n\n## The Psychology of Patina\nWhen everything is new and mass-produced, manufactured perfection loses its cachet. Vintage archives represent rebellion against algorithmic speed. Every frayed hem and faded wash tells a story that algorithms cannot simulate.\n\n> 'To wear vintage in 2026 is to anchor oneself in a tangible timeline.'",
+                image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=80&w=1200",
+                author: "Kean Donato",
+                date: "OCTOBER 24, 2026",
+                isHero: true,
+                isEditorPick: false
+            },
+            {
+                id: 'art-2',
+                title: "The Architecture of Doomscrolling: An Intentional Design Trap?",
+                category: "CULTURE",
+                excerpt: "Examining the neurological triggers behind infinite vertical feeds and why our thumbs refuse to stop.",
+                content: "Infinite scroll was originally invented to create frictionless reading experiences. Instead, it engineered a psychological loop of intermittent variable reward.\n\n## Breaking the Loop\nWhen dopamine schedules become unpredictable, human vigilance spikes. We keep scrolling not out of pleasure, but out of the primal fear of missing the next relief.",
+                image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1200",
+                author: "Elena Rostova",
+                date: "OCTOBER 22, 2026",
+                isHero: false,
+                isEditorPick: true
+            },
+            {
+                id: 'art-3',
+                title: "Why Is Everyone Buying Wired Headphones Again?",
+                category: "LIFESTYLE",
+                excerpt: "Tangible cords and tangled wires are replacing sleek wireless pods as the badge of mindful rebellion.",
+                content: "Wireless earbuds promised absolute freedom. Yet, tangled cords have made an unexpected triumphant return across subway platforms and cafes.\n\n## The Aesthetic of Friction\nFriction is often deeply comforting. Plugging in a wire signals a deliberate, analog choice to pause bluetooth connectivity and reclaim one's headspace.",
+                image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=1200",
+                author: "Marcus Vance",
+                date: "OCTOBER 19, 2026",
+                isHero: false,
+                isEditorPick: false
+            },
+            {
+                id: 'art-4',
+                title: "The Rise of Neo-Analog Escapism in Modern Urban Centers",
+                category: "SOCIETAL ISSUES",
+                excerpt: "Why city dwellers are trading smart apartments for dumb phones, film cameras, and paper notebooks.",
+                content: "Smart homes have automated our lights, thermostats, and grocery lists. In response, a quiet counter-revolution is taking root in urban apartments.\n\n## The Return of Analog Sanctuary\nRemoving screens from bedrooms is no longer just wellness advice—it is considered radical interior design. People are actively seeking environments where technology asks for nothing in return.",
+                image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&q=80&w=1200",
+                author: "Sora Takahashi",
+                date: "OCTOBER 15, 2026",
+                isHero: false,
+                isEditorPick: false
+            }
+        ];
+
+        window.radarPoll = {
+            option1Title: "GENUINE ART",
+            option1Votes: 64,
+            option2Title: "PLAGIARISM",
+            option2Votes: 36
+        };
+
+        window.subscribers = ["editor@okaybutwhy.org", "kean.donato@journal.io", "reader.pulse@outlook.com"];
+
+        // FIREBASE SYNC LISTENERS
+        window.initFirebaseSync = function() {
+            try {
+                // 1. Sync Articles
+                onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'articles'), (snapshot) => {
+                    if (!snapshot.empty) {
+                        const cloudArticles = [];
+                        snapshot.forEach(docSnap => cloudArticles.push({ id: docSnap.id, ...docSnap.data() }));
+                        window.articles = cloudArticles;
+                    }
+                    renderApp();
+                }, (err) => console.log("Articles sync fallback:", err));
+
+                // 2. Sync Site Branding Settings
+                onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'site_settings', 'branding'), (docSnap) => {
+                    if (docSnap.exists()) {
+                        window.siteBranding = docSnap.data();
+                        applySiteBranding();
+                    }
+                }, (err) => console.log("Branding sync fallback:", err));
+
+                // 3. Sync Ticker Items
+                onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'ticker', 'items'), (docSnap) => {
+                    if (docSnap.exists() && docSnap.data().items) {
+                        window.tickerItems = docSnap.data().items;
+                        renderTicker();
+                    }
+                }, (err) => console.log("Ticker sync fallback:", err));
+
+                // 4. Sync Curiosity Questions
+                onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'curiosity_questions'), (snapshot) => {
+                    if (!snapshot.empty) {
+                        const qs = [];
+                        snapshot.forEach(docSnap => qs.push({ id: docSnap.id, ...docSnap.data() }));
+                        window.curiosityQuestions = qs;
+                    }
+                    updateCuriosityDisplay();
+                }, (err) => console.log("Curiosity sync fallback:", err));
+
+                // 5. Sync Subscribers
+                onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'subscribers'), (snapshot) => {
+                    if (!snapshot.empty) {
+                        const subs = [];
+                        snapshot.forEach(docSnap => subs.push(docSnap.data().email));
+                        window.subscribers = subs;
+                        updateSubscriberCountBadge();
+                    }
+                }, (err) => console.log("Subscribers sync fallback:", err));
+
+            } catch (e) {
+                console.log("Firebase sync init error:", e);
+            }
+        };
+
+        // RENDER APP FUNCTIONS
+        window.renderApp = function() {
+            renderCategoryTabs();
+            renderHeroStory();
+            renderArticlesGrid();
+            renderEditorPick();
+            renderCuriosityRadar();
+            updateSubscriberCountBadge();
+            updateAdminUI();
+        };
+
+        window.applySiteBranding = function() {
+            document.getElementById('site-brand-part1').innerText = window.siteBranding.brand1;
+            document.getElementById('site-brand-part2-text').innerText = window.siteBranding.brand2;
+            document.getElementById('site-tagline').innerText = window.siteBranding.tagline;
+            document.getElementById('site-vol-issue').innerText = window.siteBranding.volIssue;
+            document.getElementById('site-edition').innerText = window.siteBranding.edition;
+            const radarQ = document.getElementById('radar-question-text');
+            if (radarQ) radarQ.innerText = `"${window.siteBranding.radarQuestion}"`;
+        };
+
+        window.renderCategoryTabs = function() {
+            const container = document.getElementById('category-tabs-container');
+            if (!container) return;
+            const cats = window.siteBranding.categories || ["ALL", "FASHION", "LIFESTYLE", "SOCIETAL ISSUES", "CULTURE"];
+            container.innerHTML = cats.map(cat => `
+                <button onclick="filterCategory('${cat}')" class="px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${window.activeCategory === cat ? 'bg-editorial-black text-white shadow-neo' : 'bg-editorial-cream text-editorial-black hover:bg-editorial-sand'}">
+                    ${cat}
+                </button>
+            `).join('');
+        };
+
+        window.filterCategory = function(cat) {
+            window.activeCategory = cat;
+            document.getElementById('active-category-label').innerText = `CATEGORY: ${cat}`;
+            renderCategoryTabs();
+            renderArticlesGrid();
+        };
+
+        window.renderTicker = function() {
+            const container = document.getElementById('marquee-ticker-content');
+            if (!container) return;
+            const itemsHtml = window.tickerItems.map(item => `
+                <div class="flex items-center gap-3">
+                    <span class="w-2 h-2 rounded-full bg-editorial-lime inline-block"></span>
+                    <span>${item}</span>
+                </div>
+            `).join('');
+            container.innerHTML = itemsHtml + itemsHtml;
+        };
+
+        window.renderHeroStory = function() {
+            const container = document.getElementById('hero-container');
+            if (!container) return;
+            const hero = window.articles.find(a => a.isHero) || window.articles[0];
+            if (!hero) { container.innerHTML = ''; return; }
+
+            container.innerHTML = `
+                <div class="bg-white border-3 sm:border-4 border-editorial-border p-5 sm:p-8 shadow-neo-lg rounded-2xl relative overflow-hidden group">
+                    <div class="absolute top-4 right-4 z-20 flex items-center gap-2">
+                        <div class="admin-only ${window.isAdminLoggedIn ? '' : 'hidden'} flex items-center gap-1.5 bg-editorial-black text-editorial-lime px-3 py-1 rounded text-xs font-mono font-bold shadow-neo">
+                            <button onclick="openStudioModalForEdit('${hero.id}')" class="hover:underline cursor-pointer"><i class="fa-solid fa-pen-to-square mr-1"></i> EDIT HERO</button>
+                        </div>
+                        <button onclick="toggleSaveArticle('${hero.id}')" class="bg-white/90 hover:bg-editorial-pink hover:text-white p-2.5 rounded-full border-2 border-editorial-border transition-all shadow-neo cursor-pointer">
+                            <i class="fa-bookmark ${window.savedArticleIds.includes(hero.id) ? 'fa-solid text-editorial-pink' : 'fa-regular'}"></i>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                        <div class="lg:col-span-7 space-y-4">
+                            <div class="flex items-center gap-2 font-mono text-xs">
+                                <span class="bg-editorial-pink text-white font-bold uppercase px-3 py-1 rounded-full sticker-badge">${hero.category}</span>
+                                <span class="text-editorial-gray font-semibold">• ${hero.date}</span>
+                            </div>
+                            <h2 onclick="openArticleReader('${hero.id}')" class="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase text-editorial-black hover:text-editorial-pink transition-colors cursor-pointer leading-tight">
+                                ${hero.title}
+                            </h2>
+                            <p class="text-sm sm:text-base text-editorial-gray font-sans leading-relaxed">
+                                ${hero.excerpt}
+                            </p>
+                            <div class="pt-2 flex items-center justify-between">
+                                <span class="font-mono text-xs font-bold text-editorial-black">BY ${hero.author.toUpperCase()}</span>
+                                <button onclick="openArticleReader('${hero.id}')" class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase bg-editorial-black text-white hover:bg-editorial-pink px-4 py-2.5 rounded-xl transition-all shadow-neo cursor-pointer">
+                                    READ DEEP-DIVE <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-5 overflow-hidden rounded-xl border-3 border-editorial-border shadow-neo cursor-pointer" onclick="openArticleReader('${hero.id}')">
+                            <img src="${hero.image}" alt="${hero.title}" class="w-full h-64 sm:h-80 object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/800x600/0D0D0D/FFFFFF?text=OKAY+BUT+WHY?'">
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        window.renderArticlesGrid = function() {
+            const container = document.getElementById('articles-grid');
+            if (!container) return;
+            
+            let filtered = window.articles;
+            if (window.activeCategory !== 'ALL') {
+                filtered = window.articles.filter(a => a.category.toUpperCase() === window.activeCategory.toUpperCase());
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-2 text-center py-12 font-mono text-xs text-editorial-gray">No inquiries found in this category. Use the WRITE button above to add one.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(art => `
+                <div class="bg-white border-3 border-editorial-border p-5 shadow-neo rounded-2xl flex flex-col justify-between space-y-4 relative group hover:-translate-y-1 transition-all">
+                    <div class="absolute top-4 right-4 z-20 flex items-center gap-1.5">
+                        <div class="admin-only ${window.isAdminLoggedIn ? '' : 'hidden'} flex items-center gap-1 bg-editorial-black text-editorial-lime px-2 py-0.5 rounded text-[10px] font-mono font-bold shadow-neo">
+                            <button onclick="openStudioModalForEdit('${art.id}')" class="hover:underline cursor-pointer"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="confirmDeleteArticle('${art.id}')" class="text-red-400 hover:text-red-200 cursor-pointer ml-1"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <button onclick="toggleSaveArticle('${art.id}')" class="bg-editorial-cream hover:bg-editorial-pink hover:text-white p-2 rounded-full border border-editorial-border transition-all cursor-pointer">
+                            <i class="fa-bookmark ${window.savedArticleIds.includes(art.id) ? 'fa-solid text-editorial-pink' : 'fa-regular'} text-xs"></i>
+                        </button>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="overflow-hidden rounded-xl border-2 border-editorial-border h-48 cursor-pointer" onclick="openArticleReader('${art.id}')">
+                            <img src="${art.image}" alt="${art.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/0D0D0D/FFFFFF?text=ARTICLE'">
+                        </div>
+                        <div class="flex items-center gap-2 font-mono text-[11px]">
+                            <span class="bg-editorial-cream text-editorial-black border border-editorial-border font-bold uppercase px-2.5 py-0.5 rounded">${art.category}</span>
+                            <span class="text-editorial-gray">${art.date}</span>
+                        </div>
+                        <h3 onclick="openArticleReader('${art.id}')" class="font-display text-lg font-extrabold uppercase text-editorial-black hover:text-editorial-pink transition-colors cursor-pointer leading-snug">
+                            ${art.title}
+                        </h3>
+                        <p class="text-xs text-editorial-gray font-sans line-clamp-2">
+                            ${art.excerpt}
+                        </p>
+                    </div>
+
+                    <div class="pt-3 border-t border-editorial-border/20 flex items-center justify-between text-xs font-mono">
+                        <span class="font-bold">BY ${art.author.toUpperCase()}</span>
+                        <button onclick="openArticleReader('${art.id}')" class="font-bold text-editorial-pink hover:underline uppercase flex items-center gap-1 cursor-pointer">
+                            EXPLORE <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        window.renderEditorPick = function() {
+            const container = document.getElementById('editor-pick-container');
+            if (!container) return;
+            const pick = window.articles.find(a => a.isEditorPick) || window.articles[1] || window.articles[0];
+            if (!pick) { container.innerHTML = ''; return; }
+
+            container.innerHTML = `
+                <div class="bg-editorial-black text-white border-3 border-editorial-border p-6 shadow-neo rounded-2xl space-y-4 relative group">
+                    <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                        <span class="bg-editorial-lime text-editorial-black text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded-full sticker-badge">
+                            <i class="fa-solid fa-bolt mr-1"></i> EDITOR'S CHOICE
+                        </span>
+                        <div class="admin-only ${window.isAdminLoggedIn ? '' : 'hidden'} flex items-center gap-2">
+                            <button onclick="openStudioModalForEdit('${pick.id}')" class="bg-editorial-pink text-white hover:bg-white hover:text-editorial-black text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded shadow-neo cursor-pointer transition-all">
+                                <i class="fa-solid fa-pen-to-square mr-1"></i> EDIT CHOICE
+                            </button>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <h3 onclick="openArticleReader('${pick.id}')" class="font-display text-xl font-extrabold uppercase text-white hover:text-editorial-lime transition-colors cursor-pointer leading-snug">
+                            ${pick.title}
+                        </h3>
+                        <p class="text-xs text-gray-300 font-sans leading-relaxed">
+                            ${pick.excerpt}
+                        </p>
+                    </div>
+                    <div class="pt-2">
+                        <button onclick="openArticleReader('${pick.id}')" class="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase bg-editorial-pink hover:bg-editorial-pinkDark text-white px-4 py-2 rounded-xl transition-all shadow-neo cursor-pointer">
+                            EXPLORE ISSUE <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        };
+
+        window.renderCuriosityRadar = function() {
+            const container = document.getElementById('radar-voting-container');
+            if (!container) return;
+            const total = window.radarPoll.option1Votes + window.radarPoll.option2Votes;
+            const p1 = Math.round((window.radarPoll.option1Votes / total) * 100);
+            const p2 = 100 - p1;
+
+            container.innerHTML = `
+                <div onclick="voteRadar(1)" class="p-3 bg-gray-900 border border-gray-700 hover:border-editorial-lime rounded-xl cursor-pointer transition-all relative overflow-hidden group">
+                    <div class="absolute left-0 top-0 bottom-0 bg-editorial-lime/20 transition-all duration-500" style="width: ${p1}%"></div>
+                    <div class="relative z-10 flex justify-between items-center text-xs font-mono font-bold">
+                        <span>${window.radarPoll.option1Title} 🎨</span>
+                        <span class="text-editorial-lime">${p1}%</span>
+                    </div>
+                </div>
+                <div onclick="voteRadar(2)" class="p-3 bg-gray-900 border border-gray-700 hover:border-editorial-pink rounded-xl cursor-pointer transition-all relative overflow-hidden group">
+                    <div class="absolute left-0 top-0 bottom-0 bg-editorial-pink/20 transition-all duration-500" style="width: ${p2}%"></div>
+                    <div class="relative z-10 flex justify-between items-center text-xs font-mono font-bold">
+                        <span>${window.radarPoll.option2Title} ⚠️</span>
+                        <span class="text-editorial-pink">${p2}%</span>
+                    </div>
+                </div>
+            `;
+        };
+
+        window.voteRadar = function(opt) {
+            if (opt === 1) window.radarPoll.option1Votes += 1;
+            else window.radarPoll.option2Votes += 1;
+            renderCuriosityRadar();
+            showToast("Vote recorded on Curiosity Radar!");
+        };
+
+        window.handleRadarPromptSubmit = function(e) {
+            e.preventDefault();
+            const val = document.getElementById('radar-user-prompt').value;
+            showToast("Submitted successfully to editorial team!");
+            document.getElementById('radar-user-prompt').value = '';
+        };
+
+        window.voteCuriosity = function(type) {
+            showToast(`Perspectives recorded: ${type}!`);
+            window.nextCuriosityQuestion();
+        };
+
+        window.nextCuriosityQuestion = function() {
+            window.currentCuriosityIndex = (window.currentCuriosityIndex + 1) % window.curiosityQuestions.length;
+            updateCuriosityDisplay();
+        };
+
+        window.updateCuriosityDisplay = function() {
+            const qEl = document.getElementById('curiosity-question');
+            const totalEl = document.getElementById('curiosity-total-count');
+            if (qEl && window.curiosityQuestions.length > 0) {
+                qEl.innerText = `"${window.curiosityQuestions[window.currentCuriosityIndex].text}"`;
+            }
+            if (totalEl) {
+                totalEl.innerText = window.curiosityQuestions.length;
+            }
+        };
+
+        // ADMIN & AUTH FUNCTIONS
+        window.openAdminAuthModal = function() {
+            document.getElementById('admin-auth-modal').classList.remove('hidden');
+        };
+        window.closeAdminAuthModal = function() {
+            document.getElementById('admin-auth-modal').classList.add('hidden');
+        };
+
+        window.handleAdminLogin = function(e) {
+            e.preventDefault();
+            const u = document.getElementById('admin-username').value.trim();
+            const p = document.getElementById('admin-password').value.trim();
+
+            if ((u === 'editor' || u === 'keandonato292004') && p === '@Donato100') {
+                window.isAdminLoggedIn = true;
+                localStorage.setItem('obw_admin_auth', 'true');
+                closeAdminAuthModal();
+                updateAdminUI();
+                showToast("Editor authentication successful!");
+            } else {
+                document.getElementById('admin-login-error').classList.remove('hidden');
+            }
+        };
+
+        window.adminLogout = function() {
+            window.isAdminLoggedIn = false;
+            localStorage.setItem('obw_admin_auth', 'false');
+            if (window.isInlineEditMode) toggleInlineEditMode();
+            updateAdminUI();
+            showToast("Logged out of editor session.");
+        };
+
+        window.updateAdminUI = function() {
+            const bar = document.getElementById('admin-active-bar');
+            const btn = document.getElementById('admin-access-btn');
+            const adminElements = document.querySelectorAll('.admin-only');
+
+            if (window.isAdminLoggedIn) {
+                if (bar) bar.classList.remove('hidden');
+                if (btn) btn.innerText = 'EDITOR ACTIVE';
+                adminElements.forEach(el => el.classList.remove('hidden'));
+            } else {
+                if (bar) bar.classList.add('hidden');
+                if (btn) btn.innerText = 'EDITOR ACCESS';
+                adminElements.forEach(el => el.classList.add('hidden'));
+            }
+        };
+
+        // STUDIO WRITER CMS
+        window.openStudioModal = function() {
+            if (!window.isAdminLoggedIn) { openAdminAuthModal(); return; }
+            document.getElementById('studio-modal-title').innerText = "Write New Inquiry";
+            document.getElementById('studio-article-id').value = '';
+            document.getElementById('studio-title').value = '';
+            document.getElementById('studio-excerpt').value = '';
+            document.getElementById('studio-content').value = '';
+            document.getElementById('studio-is-hero').checked = false;
+            document.getElementById('studio-is-editor-pick').checked = false;
+            populateStudioCategories();
+            document.getElementById('studio-modal').classList.remove('hidden');
+        };
+
+        window.openStudioModalForEdit = function(id) {
+            const art = window.articles.find(a => a.id === id);
+            if (!art) return;
+            document.getElementById('studio-modal-title').innerText = "Edit Inquiry";
+            document.getElementById('studio-article-id').value = art.id;
+            document.getElementById('studio-title').value = art.title;
+            document.getElementById('studio-category').value = art.category;
+            document.getElementById('studio-image').value = art.image;
+            document.getElementById('studio-author').value = art.author;
+            document.getElementById('studio-excerpt').value = art.excerpt;
+            document.getElementById('studio-content').value = art.content;
+            document.getElementById('studio-is-hero').checked = art.isHero || false;
+            document.getElementById('studio-is-editor-pick').checked = art.isEditorPick || false;
+            populateStudioCategories(art.category);
+            document.getElementById('studio-modal').classList.remove('hidden');
+        };
+
+        window.closeStudioModal = function() {
+            document.getElementById('studio-modal').classList.add('hidden');
+        };
+
+        window.populateStudioCategories = function(selected = 'FASHION') {
+            const sel = document.getElementById('studio-category');
+            if (!sel) return;
+            const cats = (window.siteBranding.categories || []).filter(c => c !== 'ALL');
+            sel.innerHTML = cats.map(c => `<option value="${c}" ${c === selected ? 'selected' : ''}>${c}</option>`).join('');
+        };
+
+        window.insertStudioFormat = function(pre, post) {
+            const textarea = document.getElementById('studio-content');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const val = textarea.value;
+            textarea.value = val.substring(0, start) + pre + val.substring(start, end) + post + val.substring(end);
+            textarea.focus();
+        };
+
+        window.handleStudioSubmit = async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('studio-article-id').value;
+            const title = document.getElementById('studio-title').value;
+            const category = document.getElementById('studio-category').value;
+            const image = document.getElementById('studio-image').value;
+            const author = document.getElementById('studio-author').value;
+            const excerpt = document.getElementById('studio-excerpt').value;
+            const content = document.getElementById('studio-content').value;
+            const isHero = document.getElementById('studio-is-hero').checked;
+            const isEditorPick = document.getElementById('studio-is-editor-pick').checked;
+            const notify = document.getElementById('studio-notify-digest').checked;
+
+            if (isHero) window.articles.forEach(a => a.isHero = false);
+            if (isEditorPick) window.articles.forEach(a => a.isEditorPick = false);
+
+            const artObj = {
+                id: id || 'art-' + Date.now(),
+                title, category, image, author, excerpt, content, isHero, isEditorPick,
+                date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase()
+            };
+
+            if (id) {
+                const idx = window.articles.findIndex(a => a.id === id);
+                if (idx !== -1) window.articles[idx] = artObj;
+            } else {
+                window.articles.unshift(artObj);
+            }
+
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', artObj.id), artObj);
+            } catch (err) {
+                console.log("Firestore article write err:", err);
+            }
+
+            closeStudioModal();
+            renderApp();
+            showToast(notify ? "Published & Digest Subscribers Notified!" : "Article published successfully!");
+        };
+
+        window.confirmDeleteArticle = async function(id) {
+            if (confirm("Are you sure you want to delete this article?")) {
+                window.articles = window.articles.filter(a => a.id !== id);
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'articles', id));
+                } catch(e) {}
+                renderApp();
+                showToast("Article deleted successfully.");
+            }
+        };
+
+        // SITE BRANDING SETTINGS MODAL
+        window.openSiteSettingsModal = function() {
+            if (!window.isAdminLoggedIn) { openAdminAuthModal(); return; }
+            document.getElementById('set-brand1').value = window.siteBranding.brand1;
+            document.getElementById('set-brand2').value = window.siteBranding.brand2;
+            document.getElementById('set-tagline').value = window.siteBranding.tagline;
+            document.getElementById('set-vol').value = window.siteBranding.volIssue;
+            document.getElementById('set-edition').value = window.siteBranding.edition;
+            document.getElementById('set-radar-q').value = window.siteBranding.radarQuestion;
+            document.getElementById('set-categories').value = (window.siteBranding.categories || []).join(', ');
+            document.getElementById('site-settings-modal').classList.remove('hidden');
+        };
+        window.closeSiteSettingsModal = function() {
+            document.getElementById('site-settings-modal').classList.add('hidden');
+        };
+
+        window.handleSaveSiteSettings = async function(e) {
+            e.preventDefault();
+            window.siteBranding.brand1 = document.getElementById('set-brand1').value;
+            window.siteBranding.brand2 = document.getElementById('set-brand2').value;
+            window.siteBranding.tagline = document.getElementById('set-tagline').value;
+            window.siteBranding.volIssue = document.getElementById('set-vol').value;
+            window.siteBranding.edition = document.getElementById('set-edition').value;
+            window.siteBranding.radarQuestion = document.getElementById('set-radar-q').value;
+            window.siteBranding.categories = document.getElementById('set-categories').value.split(',').map(s => s.trim().toUpperCase());
+
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'site_settings', 'branding'), window.siteBranding);
+            } catch(e) {}
+
+            closeSiteSettingsModal();
+            applySiteBranding();
+            renderApp();
+            showToast("Site branding and settings updated successfully!");
+        };
+
+        // TICKER EDITOR
+        window.openTickerEditModal = function() {
+            if (!window.isAdminLoggedIn) { openAdminAuthModal(); return; }
+            document.getElementById('ticker-items-input').value = window.tickerItems.join('\n');
+            document.getElementById('ticker-edit-modal').classList.remove('hidden');
+        };
+        window.closeTickerEditModal = function() {
+            document.getElementById('ticker-edit-modal').classList.add('hidden');
+        };
+        window.saveTickerItems = async function() {
+            const raw = document.getElementById('ticker-items-input').value;
+            window.tickerItems = raw.split('\n').map(s => s.trim()).filter(Boolean);
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ticker', 'items'), { items: window.tickerItems });
+            } catch(e) {}
+            closeTickerEditModal();
+            renderTicker();
+            showToast("Trend Ticker updated successfully!");
+        };
+
+        // CURIOSITY QUESTION EDIT
+        window.openEditCuriosityModal = function() {
+            document.getElementById('edit-curiosity-text').value = window.curiosityQuestions[window.currentCuriosityIndex].text;
+            document.getElementById('curiosity-edit-modal').classList.remove('hidden');
+        };
+        window.closeEditCuriosityModal = function() {
+            document.getElementById('curiosity-edit-modal').classList.add('hidden');
+        };
+        window.saveCuriosityEdit = function() {
+            const txt = document.getElementById('edit-curiosity-text').value;
+            window.curiosityQuestions[window.currentCuriosityIndex].text = txt;
+            closeEditCuriosityModal();
+            updateCuriosityDisplay();
+            showToast("Burning question updated!");
+        };
+        window.addNewCuriosityQuestion = function() {
+            const q = prompt("Enter new burning inquiry question:");
+            if (q) {
+                window.curiosityQuestions.push({ id: Date.now(), text: q });
+                window.currentCuriosityIndex = window.curiosityQuestions.length - 1;
+                updateCuriosityDisplay();
+                showToast("New burning question added!");
+            }
+        };
+        window.deleteCurrentCuriosityQuestion = function() {
+            if (window.curiosityQuestions.length <= 1) { alert("Cannot delete last question."); return; }
+            window.curiosityQuestions.splice(window.currentCuriosityIndex, 1);
+            window.currentCuriosityIndex = 0;
+            updateCuriosityDisplay();
+            showToast("Question deleted.");
+        };
+
+        // WEEKLY DIGEST & SUBSCRIBERS
+        window.handleDigestSubscribe = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('digest-email-input').value;
+            if (!window.subscribers.includes(email)) {
+                window.subscribers.push(email);
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'subscribers'), { email, timestamp: Date.now() });
+                } catch(e) {}
+            }
+            document.getElementById('digest-email-input').value = '';
+            updateSubscriberCountBadge();
+            showToast("Subscribed successfully to Weekly Digest!");
+        };
+
+        window.updateSubscriberCountBadge = function() {
+            const badge = document.getElementById('digest-sub-badge-count');
+            if (badge) badge.innerText = window.subscribers.length;
+        };
+
+        window.openSubscribersModal = function() {
+            const container = document.getElementById('subscribers-list-container');
+            container.innerHTML = window.subscribers.map(sub => `<div>• ${sub}</div>`).join('');
+            document.getElementById('subscribers-modal').classList.remove('hidden');
+        };
+        window.closeSubscribersModal = function() {
+            document.getElementById('subscribers-modal').classList.add('hidden');
+        };
+        window.sendTestDigestBroadcast = function() {
+            showToast(`Test digest broadcast successfully sent to ${window.subscribers.length} subscribers!`);
+        };
+
+        // FIREBASE MODAL
+        window.openFirebaseConfigModal = function() {
+            document.getElementById('firebase-config-modal').classList.remove('hidden');
+        };
+        window.closeFirebaseConfigModal = function() {
+            document.getElementById('firebase-config-modal').classList.add('hidden');
+        };
+
+        // INLINE EDIT MODE
+        window.toggleInlineEditMode = function() {
+            window.isInlineEditMode = !window.isInlineEditMode;
+            const btn = document.getElementById('inline-edit-toggle-btn');
+            const elements = document.querySelectorAll('.editable-element');
+            if (window.isInlineEditMode) {
+                btn.classList.add('bg-editorial-pink', 'text-white');
+                btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-1"></i> INLINE: ON';
+                elements.forEach(el => el.classList.add('inline-editable-active'));
+                showToast("Inline Edit Mode ON. Click any title or tagline to edit.");
+            } else {
+                btn.classList.remove('bg-editorial-pink', 'text-white');
+                btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-1"></i> INLINE: OFF';
+                elements.forEach(el => el.classList.remove('inline-editable-active'));
+                showToast("Inline Edit Mode OFF.");
+            }
+        };
+
+        window.handleInlineClick = function(key, label) {
+            if (!window.isInlineEditMode) return;
+            const val = prompt(`Edit ${label}:`, window.siteBranding[key] || '');
+            if (val !== null) {
+                window.siteBranding[key] = val;
+                applySiteBranding();
+                showToast(`${label} updated successfully!`);
+            }
+        };
+
+        // ARTICLE READER MODAL
+        window.openArticleReader = function(id) {
+            const art = window.articles.find(a => a.id === id);
+            if (!art) return;
+            document.getElementById('reader-category-pill').innerText = art.category;
+            document.getElementById('reader-title').innerText = art.title;
+            document.getElementById('reader-author').innerText = art.author.toUpperCase();
+            document.getElementById('reader-date').innerText = art.date;
+            document.getElementById('reader-image').src = art.image;
+            document.getElementById('reader-body').innerHTML = art.content.split('\n\n').map(p => {
+                if (p.startsWith('## ')) return `<h3 class="font-display text-xl font-bold uppercase mt-6 mb-2 text-editorial-black">${p.replace('## ', '')}</h3>`;
+                if (p.startsWith('> ')) return `<blockquote class="border-l-4 border-editorial-pink pl-4 italic my-4 text-editorial-gray font-brand text-lg">${p.replace('> ', '')}</blockquote>`;
+                return `<p>${p}</p>`;
+            }).join('');
+            document.getElementById('article-reader-modal').classList.remove('hidden');
+        };
+        window.closeArticleReader = function() {
+            document.getElementById('article-reader-modal').classList.add('hidden');
+        };
+
+        // SAVED ARTICLES
+        window.toggleSaveArticle = function(id) {
+            if (window.savedArticleIds.includes(id)) {
+                window.savedArticleIds = window.savedArticleIds.filter(i => i !== id);
+                showToast("Removed from saved articles.");
+            } else {
+                window.savedArticleIds.push(id);
+                showToast("Saved to your reading list!");
+            }
+            localStorage.setItem('obw_saved', JSON.stringify(window.savedArticleIds));
+            document.getElementById('saved-count').innerText = window.savedArticleIds.length;
+            renderApp();
+        };
+
+        window.openSavedDrawer = function() {
+            const saved = window.articles.filter(a => window.savedArticleIds.includes(a.id));
+            if (saved.length === 0) {
+                showToast("No saved articles in your reading list yet.");
+                return;
+            }
+            openArticleReader(saved[0].id);
+        };
+
+        // SEARCH MODAL
+        window.openSearchModal = function() {
+            document.getElementById('search-modal').classList.remove('hidden');
+            document.getElementById('search-input').focus();
+        };
+        window.closeSearchModal = function() {
+            document.getElementById('search-modal').classList.add('hidden');
+        };
+        window.handleSearchInput = function(e) {
+            const q = e.target.value.toLowerCase();
+            const container = document.getElementById('search-results-container');
+            if (!q) { container.innerHTML = ''; return; }
+            const res = window.articles.filter(a => a.title.toLowerCase().includes(q) || a.excerpt.toLowerCase().includes(q) || a.category.toLowerCase().includes(q));
+            container.innerHTML = res.map(r => `
+                <div onclick="closeSearchModal(); openArticleReader('${r.id}')" class="p-3 bg-gray-900 border border-gray-800 hover:border-editorial-pink rounded-xl cursor-pointer transition-all space-y-1">
+                    <span class="text-editorial-lime text-[10px] font-bold uppercase">${r.category}</span>
+                    <div class="font-bold text-white">${r.title}</div>
+                </div>
+            `).join('') || '<div class="text-gray-400">No matching inquiries found.</div>';
+        };
+
+        // TOAST HELPER
+        window.showToast = function(msg) {
+            const t = document.getElementById('toast-notification');
+            document.getElementById('toast-message').innerText = msg;
+            t.classList.remove('hidden');
+            setTimeout(() => t.classList.add('hidden'), 3500);
+        };
+
+        // WINDOW SCROLL COLLAPSE LISTENER
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('main-header');
+            if (window.scrollY > 50) {
+                header.classList.add('is-scrolled');
+            } else {
+                header.classList.remove('is-scrolled');
+            }
+        });
+
+        // INITIALIZE ON LOAD
+        window.onload = function() {
+            applySiteBranding();
+            renderTicker();
+            initFirebaseSync();
+            renderApp();
+            document.getElementById('saved-count').innerText = window.savedArticleIds.length;
+        };
+    </script>
+</body>
+</html>
